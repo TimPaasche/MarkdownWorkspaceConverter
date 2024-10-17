@@ -171,16 +171,18 @@ namespace MarkdownWorkspaceConverter
             //}
 
             // FIX SEPERATOR COUNT
-            string pattern = @"(\|[^\n]+\|\r?\n)((?:\|:?[-]+:?)+\|)";
+            string pattern = @"(\|[^\n]+\|?\r?\n)((?:\|:?[-]+:?)+\|)";
             MatchCollection regexMatches = Regex.Matches(mdStream, pattern);
 
             foreach (Match match in regexMatches)
             {
-                int countHeader = match.Groups[1].Value.Split('|').Length - 2; // Adjusted to get the correct count
-                FancyTerminal.PrintInfo(task: $"Count Columns (header): {countHeader}", location: "x");
-                int countSeparator = match.Groups[2].Value.Split('|').Length - 2; // Adjusted to get the correct count
-                FancyTerminal.PrintInfo(task: $"Count Columns (separator): {countSeparator}", location: "x");
-                for (int i = 0; i < countSeparator - countHeader; i++)
+                //string findCellRegexPattern = @"\|(?:([^|]*)\|?)*\n";
+                string findCellRegexPattern = @"\|([^|\n\r]+)";
+
+                int headerMatchesCount = Regex.Matches(match.Groups[1].Value, findCellRegexPattern).Count;
+                int separatorMatchesCount = Regex.Matches(match.Groups[2].Value, findCellRegexPattern).Count;
+
+                for (int i = 0; i < separatorMatchesCount - headerMatchesCount; i++)
                 {
                     var firstHalf = mdStream.Substring(0, match.Groups[2].Index);
                     var secondHalf = mdStream.Substring(match.Groups[2].Index).TrimStart('|').TrimStart('-');
