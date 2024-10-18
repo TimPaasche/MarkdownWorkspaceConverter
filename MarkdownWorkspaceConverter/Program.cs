@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 namespace MarkdownWorkspaceConverter;
@@ -11,9 +8,9 @@ internal class Program
     private static void Main(string[] args)
     {
 #if DEBUG
-        args = [@"C:\Users\DEPAATIM\Desktop\Test\WIKI", @"C:\Users\DEPAATIM\Desktop\Test\WIKI-copy"];
+        //args = [@"C:\Users\DEPAATIM\Desktop\Test\WIKI", @"C:\Users\DEPAATIM\Desktop\Test\WIKI-copy"];
         //args = [@"C:\Users\DEPAATIM\Desktop\Test\WIKI", @"C:\Users\DEPAATIM\Desktop\Test\WIKI-copy", "--mdBook"];
-        //args = [@"C:\TFS\Repository\Inno_ICom_wiki", @"C:\Users\DEPAATIM\Desktop\Test\Inno_ICom_wiki_copy"];
+        args = [@"D:\Repository\Inno_ICom.wiki", @"C:\Users\DEPAATIM\Desktop\Test\Inno_ICom_wiki_copy"];
 #endif
         if (args.Length < 2 || args.Length > 3)
         {
