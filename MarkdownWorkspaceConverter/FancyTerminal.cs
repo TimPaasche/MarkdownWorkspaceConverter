@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 namespace MarkdownWorkspaceConverter;
 public static class FancyTerminal
 {
 
-    private const char _borderChar = ' ';
-    private const int _borderLength = 110;
+    private const char _borderChar = '.';
+    private const int _borderLength = 92;
 
     public static void PrintHeader(string task, string location)
     {
@@ -73,5 +69,27 @@ public static class FancyTerminal
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine($"{task.PadRight(countOfDashes, _borderChar)}{location}");
         Console.ResetColor();
+    }
+
+    public static string ExecuteCommand(string command, string args)
+    {
+
+        ProcessStartInfo psi = new ProcessStartInfo()
+        {
+            FileName = command,
+            Arguments = args,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using (Process process = new Process { StartInfo = psi })
+        {
+            process.Start();
+            string result = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            return result;
+        }
     }
 }

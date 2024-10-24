@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace MarkdownWorkspaceConverter;
 internal static class MarkdownFormatter
@@ -11,9 +6,10 @@ internal static class MarkdownFormatter
 
     internal static string FormatMarkdownHeadlines(this string mdStream)
     {
-        string pattern = @"(#+)([\w]+)";
+        string pattern = @"^(#+)([\w\-\[!])";
+        Regex regex = new(pattern, RegexOptions.Multiline);
         string replacement = @"$1 $2";
-        string result = Regex.Replace(mdStream, pattern, replacement);
+        string result = regex.Replace(mdStream, replacement);
 
         return result;
     }
@@ -57,6 +53,46 @@ internal static class MarkdownFormatter
 
     internal static string FormatImagesLiningSpaces(this string mdStream)
     {
-        return null;
+        string pattern = @"(?<=\r\n)!\[.+?\]\(.*?\)(?=\r\n)|(?<=\n)!\[.+?\]\(.*?\)(?=\n)";
+        string replacement = $"\n$&\n";
+        Regex regex = new Regex(pattern);
+        return regex.Replace(mdStream, replacement);
+    }
+
+    internal static string RefactorHorizontalLines(this string mdStream)
+    {
+        string pattern = @"(?<=\r\n)-+(?=\r\n)|(?<=\n)-+(?=\n)";
+        string replacement = "<hr>";
+        Regex regex = new Regex(pattern);
+        return regex.Replace(mdStream, replacement);
+    }
+
+    internal static string RefactorTOC(this string mdStream)
+    {
+        if (!mdStream.Contains("[[_TOC_]]"))
+        {
+            return mdStream;
+        }
+
+        string pattern = @"^(#+)\s+(.+)$";
+        Regex regex = new(pattern, RegexOptions.Multiline);
+        MatchCollection matches = regex.Matches(mdStream);
+
+        string toc = "# Table Of Contents:\n\n";
+        foreach (Match match in matches)
+        {
+            int indents = match.Groups[1].Length - 1;
+            string headline = match.Groups[2].Value.Trim();
+            string refernceLink = headline.ToLower().Replace(' ', '-').Trim();
+            for (int i = 0; i < indents; i++)
+            {
+                toc += "\t";
+            }
+            toc += "- ";
+            toc += $"[{headline}](#{refernceLink})\n";
+        }
+        toc += "<hr>\n<br>\n<br>\n";
+        mdStream = mdStream.Replace("[[_TOC_]]", toc);
+        return mdStream;
     }
 }

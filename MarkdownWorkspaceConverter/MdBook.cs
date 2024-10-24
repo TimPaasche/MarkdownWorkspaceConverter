@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MarkdownWorkspaceConverter;
+﻿namespace MarkdownWorkspaceConverter;
 internal class MdBook
 {
     internal string Title { get; }
@@ -23,28 +15,20 @@ internal class MdBook
 
     internal string Init()
     {
-        string command = $"mdbook init --force --title {Title} --ignore git {_outputDir}";
-
-        // Start the process
-        var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "cmd.exe",
-                Arguments = "/c " + command,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            }
-        };
-
-        process.Start();
-
-        // Read the output
-        string result = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
+        string command = $"mdbook";
+        string arg = $"init --force --title {Title} --ignore git {_outputDir}";
+        string result = FancyTerminal.ExecuteCommand(command, arg);
 
         File.Delete(_outputDir + "/src/chapter_1.md");
+
+        return result;
+    }
+
+    internal string Build()
+    {
+        string command = $"mdbook";
+        string args = $"build {_outputDir} -o";
+        string result = FancyTerminal.ExecuteCommand(command, args);
 
         return result;
     }
